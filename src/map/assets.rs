@@ -7,7 +7,7 @@ pub struct SpawnableAsset {
     sprite_name: &'static str,
     grid_offset: GridDelta,
     offset: Vec3,
-    componets_spawner: fn(&mut EntityCommands),
+    components_spawner: fn(&mut EntityCommands),
 }
 
 impl SpawnableAsset {
@@ -16,7 +16,7 @@ impl SpawnableAsset {
             sprite_name,
             grid_offset: GridDelta::new(0,0,0),
             offset: Vec3::ZERO,
-            componets_spawner: |_| {},
+            components_spawner: |_| {},
         }
     }
 
@@ -60,7 +60,7 @@ pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec
                 sprite_name,
                 grid_offset,
                 offset,
-                componets_spawner,
+                components_spawner,
             } = asset_def;
 
             let Some(atlas_index) = TILEMAP.sprite_index(sprite_name) else {
@@ -73,7 +73,7 @@ pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec
                     assets_bundle: tilemap_handles.sprite(atlas_index),
                     grid_offset,
                     world_offset: offset,
-                    spawn_commands: componets_spawner,
+                    spawn_commands: components_spawner,
                 },
             )
         }

@@ -25,38 +25,7 @@
                 directional: true,
             ),
             Jump: (
-                start_row: 26,    (
-        name: "female",
-        // Character attributes
-        max_health: 95.0,
-        base_move_speed: 150.0,
-        run_speed_multiplier: 1.9,
-        
-        // Animation data
-        texture_path: "female_spritesheet.png",
-        tile_size: 64,
-        atlas_columns: 9,
-        animations: {
-            Walk: (
-                start_row: 8,
-                frame_count: 9,
-                frame_time: 0.1,
-                directional: true,
-            ),
-            Run: (
-                start_row: 38,
-                frame_count: 8,
-                frame_time: 0.08,
-                directional: true,
-            ),
-            Jump: (
-                start_row: 26,
-                frame_count: 5,
-                frame_time: 0.1,
-                directional: true,
-            ),
-        }
-    ),
+                start_row: 26,    
                 frame_count: 5,
                 frame_time: 0.1,
                 directional: true,
