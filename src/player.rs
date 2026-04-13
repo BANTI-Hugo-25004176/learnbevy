@@ -1,4 +1,4 @@
-use bevy::{ecs::query, math::{NormedVectorSpace, VectorSpace}, prelude::*, state::commands};
+use bevy::{prelude::*};
 
 const TILE_SIZE: u32 = 64;
 const WALK_FRAMES: usize = 9;
