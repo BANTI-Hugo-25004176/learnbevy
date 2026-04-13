@@ -4,6 +4,7 @@ const TILE_SIZE: u32 = 64;
 const WALK_FRAMES: usize = 9;
 const MOVE_SPEED: f32 = 140.0;
 const ANIM_DT: f32 = 0.1;
+const PLAYER_Z: f32 = 20.0;
 
 #[derive(Component)]
 struct Player;
@@ -27,7 +28,7 @@ struct AnimationState {
 }
 
 fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut atlas_layout: ResMut<Assets<TextureAtlasLayout>>) {
-    let texture = asset_server.load("character-spritesheet.png");
+    let texture = asset_server.load("male_spritesheet.png");
     let layout = atlas_layout.add(TextureAtlasLayout::from_grid(UVec2::splat(TILE_SIZE), WALK_FRAMES as u32, 12, None, None));
     let facing = Facing::Down;
     let start_index = atlas_index_for(facing, 0);
@@ -39,7 +40,7 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut atla
                 index: start_index, 
             },
         ),
-        Transform::from_translation(Vec3::ZERO),
+        Transform::from_translation(Vec3::new(0.,0., PLAYER_Z)).with_scale(Vec3::splat(0.8)),
         Player,
         AnimationState { facing, moving: false, was_moving: false },
         AnimationTimer(Timer::from_seconds(ANIM_DT, TimerMode::Repeating)),
