@@ -1,0 +1,11 @@
+sudo apt install \
+  libwayland-dev \
+  libxkbcommon-dev \
+  libudev-dev \
+  libasound2-dev \
+  libssl-dev \
+  pkg-config \
+  libx11-dev \
+  libxi-dev \
+  libxcursor-dev \
+  libxrandr-dev
