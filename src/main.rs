@@ -5,6 +5,7 @@ use crate::{map::generate::{map_pixel_dimensions, setup_generator}};
 
 mod map;
 mod characters;
+mod state;
 
 fn main() {
     let map_size = map_pixel_dimensions();
@@ -23,6 +24,7 @@ fn main() {
         ..Default::default()
     }).set(ImagePlugin::default_nearest()),)
     .add_plugins(ProcGenSimplePlugin::<Cartesian3D, Sprite>::default())
+    .add_plugins(state::StatePlugin)
     .add_plugins(characters::CharactersPlugin)
     .add_systems(Startup, (setup_camera, setup_generator))
     .run();
