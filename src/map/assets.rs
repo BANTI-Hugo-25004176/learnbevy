@@ -3,6 +3,7 @@ use bevy_procedural_tilemaps::prelude::*;
 
 use crate::map::tilemap::TILEMAP;
 use crate::collision::{TileMarker, TileType};
+use crate::inventory::{ItemKind, Pickable};
 
 #[derive(Clone)]
 pub struct SpawnableAsset {
@@ -10,6 +11,7 @@ pub struct SpawnableAsset {
     grid_offset: GridDelta,
     offset: Vec3,
     tile_type: Option<TileType>,
+    pickable: Option<ItemKind>,
 }
 
 impl SpawnableAsset {
@@ -19,6 +21,7 @@ impl SpawnableAsset {
             grid_offset: GridDelta::new(0,0,0),
             offset: Vec3::ZERO,
             tile_type: None,
+            pickable: None
         }
     }
 
@@ -29,6 +32,11 @@ impl SpawnableAsset {
 
     pub fn with_tile_type(mut self, tile_type: TileType) -> Self {
         self.tile_type = Some(tile_type);
+        self
+    }
+
+    pub fn with_pickable(mut self, kind: ItemKind) -> Self {
+        self.pickable = Some(kind);
         self
     }
 }
@@ -59,34 +67,46 @@ pub fn prepare_tilemap_handles(asset_server: &Res<AssetServer>, atlas_layouts: &
     TilemapHandles { image, layout }
 }
 
-fn create_spawner(
-    tile_type: Option<TileType>,
-) -> fn(&mut EntityCommands) {
-    match tile_type {
-        Some(TileType::Dirt) => |e: &mut EntityCommands| {
+fn create_spawner(tile_type: Option<TileType>, pickable: Option<ItemKind>) -> fn(&mut EntityCommands) {
+    match (tile_type, pickable) {
+        // Tile types without pickable
+        (Some(TileType::Dirt), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Dirt));
         },
-        Some(TileType::Grass) => |e: &mut EntityCommands| {
+        (Some(TileType::Grass), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Grass));
         },
-        Some(TileType::YellowGrass) => |e: &mut EntityCommands| {
+        (Some(TileType::YellowGrass), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::YellowGrass));
         },
-        Some(TileType::Water) => |e: &mut EntityCommands| {
+        (Some(TileType::Water), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Water));
         },
-        Some(TileType::Shore) => |e: &mut EntityCommands| {
+        (Some(TileType::Shore), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Shore));
         },
-        Some(TileType::Tree) => |e: &mut EntityCommands| {
+        (Some(TileType::Tree), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Tree));
         },
-        Some(TileType::Rock) => |e: &mut EntityCommands| {
+        (Some(TileType::Rock), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Rock));
         },
-        Some(TileType::Empty) => |e: &mut EntityCommands| {
+        (Some(TileType::Empty), None) => |e: &mut EntityCommands| {
             e.insert(TileMarker::new(TileType::Empty));
         },
+        (Some(TileType::Grass), Some(ItemKind::Plant1)) => |e: &mut EntityCommands| {
+            e.insert((TileMarker::new(TileType::Grass), Pickable::new(ItemKind::Plant1)));
+        },
+        (Some(TileType::Grass), Some(ItemKind::Plant2)) => |e: &mut EntityCommands| {
+            e.insert((TileMarker::new(TileType::Grass), Pickable::new(ItemKind::Plant2)));
+        },
+        (Some(TileType::Grass), Some(ItemKind::Plant3)) => |e: &mut EntityCommands| {
+            e.insert((TileMarker::new(TileType::Grass), Pickable::new(ItemKind::Plant3)));
+        },
+        (Some(TileType::Grass), Some(ItemKind::Plant4)) => |e: &mut EntityCommands| {
+            e.insert((TileMarker::new(TileType::Grass), Pickable::new(ItemKind::Plant4)));
+        },
+
         _ => |_: &mut EntityCommands| {},
     }
 }
@@ -100,13 +120,14 @@ pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec
                 grid_offset,
                 offset,
                 tile_type,
+                pickable,
             } = asset_def;
 
             let Some(atlas_index) = TILEMAP.sprite_index(sprite_name) else {
                 panic!("Unknown atlas sprite '{}'", sprite_name);
             };
 
-            let spawner = create_spawner(tile_type);
+            let spawner = create_spawner(tile_type, pickable);
 
             models_assets.add(
                 model_index,

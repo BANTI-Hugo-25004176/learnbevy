@@ -1,28 +1,20 @@
 use bevy_procedural_tilemaps::prelude::*;
 use bevy::prelude::*;
 
+use crate::config::map::{GRID_X, GRID_Y, NODE_SIZE_Z, TILE_SIZE};
 use crate::map::{
     assets::{load_assets, prepare_tilemap_handles},
     rules::build_world,
 };
 
-pub const GRID_X: u32 = 25;
-pub const GRID_Y: u32 = 18;
-
 const ASSETS_PATH: &str = "tile_layers";
 const TILEMAP_FILE: &str = "tilemap.png";
 
-pub const TILE_SIZE: f32 = 32.;
+const NODE_SIZE: Vec3 = Vec3::new(TILE_SIZE, TILE_SIZE, NODE_SIZE_Z);
 
-const NODE_SIZE: Vec3 = Vec3::new(TILE_SIZE, TILE_SIZE, 1.);
-
-const ASSETS_SCALE: Vec3 = Vec3::ONE;
+const ASSETS_SCALE: Vec3 = Vec3::new(2.0, 2.0, 1.0);
 
 const GRID_Z: u32 = 5;
-
-pub fn map_pixel_dimensions() -> Vec2 {
-    Vec2::new(TILE_SIZE * GRID_X as f32, TILE_SIZE * GRID_Y as f32)
-}
 
 pub fn setup_generator(mut commands: Commands, asset_server: Res<AssetServer>, mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,) {
     let (assets_definitions, models, socket_collection) = build_world();
