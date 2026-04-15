@@ -1,13 +1,15 @@
 use bevy::{prelude::*};
 use bevy_procedural_tilemaps::prelude::*;
+
 use crate::map::tilemap::TILEMAP;
+use crate::collision::{TileMarker, TileType};
 
 #[derive(Clone)]
 pub struct SpawnableAsset {
     sprite_name: &'static str,
     grid_offset: GridDelta,
     offset: Vec3,
-    components_spawner: fn(&mut EntityCommands),
+    tile_type: Option<TileType>,
 }
 
 impl SpawnableAsset {
@@ -16,12 +18,17 @@ impl SpawnableAsset {
             sprite_name,
             grid_offset: GridDelta::new(0,0,0),
             offset: Vec3::ZERO,
-            components_spawner: |_| {},
+            tile_type: None,
         }
     }
 
     pub fn with_grid_offset(mut self, offset: GridDelta) -> Self {
         self.grid_offset = offset;
+        self
+    }
+
+    pub fn with_tile_type(mut self, tile_type: TileType) -> Self {
+        self.tile_type = Some(tile_type);
         self
     }
 }
@@ -52,6 +59,38 @@ pub fn prepare_tilemap_handles(asset_server: &Res<AssetServer>, atlas_layouts: &
     TilemapHandles { image, layout }
 }
 
+fn create_spawner(
+    tile_type: Option<TileType>,
+) -> fn(&mut EntityCommands) {
+    match tile_type {
+        Some(TileType::Dirt) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Dirt));
+        },
+        Some(TileType::Grass) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Grass));
+        },
+        Some(TileType::YellowGrass) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::YellowGrass));
+        },
+        Some(TileType::Water) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Water));
+        },
+        Some(TileType::Shore) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Shore));
+        },
+        Some(TileType::Tree) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Tree));
+        },
+        Some(TileType::Rock) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Rock));
+        },
+        Some(TileType::Empty) => |e: &mut EntityCommands| {
+            e.insert(TileMarker::new(TileType::Empty));
+        },
+        _ => |_: &mut EntityCommands| {},
+    }
+}
+
 pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec<SpawnableAsset>>,) -> ModelsAssets<Sprite> {
     let mut models_assets = ModelsAssets::<Sprite>::new();
     for (model_index, assets) in assets_definitions.into_iter().enumerate() {
@@ -60,12 +99,14 @@ pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec
                 sprite_name,
                 grid_offset,
                 offset,
-                components_spawner,
+                tile_type,
             } = asset_def;
 
             let Some(atlas_index) = TILEMAP.sprite_index(sprite_name) else {
                 panic!("Unknown atlas sprite '{}'", sprite_name);
             };
+
+            let spawner = create_spawner(tile_type);
 
             models_assets.add(
                 model_index,
@@ -73,7 +114,7 @@ pub fn load_assets(tilemap_handles: &TilemapHandles, assets_definitions: Vec<Vec
                     assets_bundle: tilemap_handles.sprite(atlas_index),
                     grid_offset,
                     world_offset: offset,
-                    spawn_commands: components_spawner,
+                    spawn_commands: spawner,
                 },
             )
         }

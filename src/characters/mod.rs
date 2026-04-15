@@ -5,6 +5,8 @@ pub mod state;
 pub mod facing;
 pub mod input;
 pub mod physics;
+pub mod collider;
+mod rendering;
 
 use bevy::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
@@ -23,7 +25,9 @@ impl Plugin for CharactersPlugin {
                 spawn::switch_character,
                 input::update_jump_state,
                 animation::on_state_change_update_animation,
+                collider::validate_movement,
                 physics::apply_velocity,
+                rendering::update_player_depth,
                 animation::animations_playback,
             ).chain().run_if(in_state(GameState::Playing)));
     }
